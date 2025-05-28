@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { requestFirebaseNotificationPermission } from "./firebase/firebaseMessaging";
+import { requestFirebaseNotificationPermission, onMessageListener } from "./firebase/firebaseMessaging";
 
 import Familiares from "./pages/Familiares";
 import FamiliarDetalle from "./pages/FamiliarDetalle";
@@ -10,12 +10,19 @@ import Historias from "./pages/Historias";
 import QuienSoy from "./pages/QuienSoy";
 import EditarPerfil from "./pages/EditarPerfil";
 import Recordatorios from "./pages/Recordatorios";
-import ReconocimientoVoz from "./pages/ReconocimientoVoz"; // si lo usas solo como página
-import ControlVoz from "./pages/ControlVoz"; // página para control con comandos
+import ReconocimientoVoz from "./pages/ReconocimientoVoz";
+import ControlVoz from "./pages/ControlVoz";
 
 function App() {
   useEffect(() => {
     requestFirebaseNotificationPermission();
+
+    // Escuchar notificaciones en primer plano
+    onMessageListener()
+      .then(payload => {
+        alert(`Notificación: ${payload.notification.title}\n${payload.notification.body}`);
+      })
+      .catch(err => console.log("Error escuchando mensajes: ", err));
   }, []);
 
   return (
@@ -29,10 +36,7 @@ function App() {
         <Route path="/quien-soy" element={<QuienSoy />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
         <Route path="/recordatorios" element={<Recordatorios />} />
-         {/* Ruta para solo probar el reconocimiento */}
         <Route path="/reconocimiento" element={<ReconocimientoVoz />} />
-
-        {/* Ruta para control por voz con navegación */}
         <Route path="/control-voz" element={<ControlVoz />} />
       </Routes>
     </Router>
